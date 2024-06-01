@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './App.css';
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -13,16 +14,6 @@ function App() {
       setTasks([...tasks, { id: Date.now(), text: newTask, completed: false }]);
       setNewTask('');
     }
-  };
-
-  const handleDeleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
-  };
-
-  const handleToggleComplete = (id) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
   };
 
   return (
@@ -44,7 +35,6 @@ function App() {
             >
               {task.text}
             </span>
-            <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
           </li>
         ))}
       </ul>
