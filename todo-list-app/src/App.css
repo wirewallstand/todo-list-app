@@ -1,16 +1,57 @@
-.App {
+/* App.css */
+
+body {
   font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 20px;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-input {
-  padding: 8px;
-  margin-right: 10px;
+.App {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+select {
+  width: calc(100% - 22px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 button {
-  padding: 8px 12px;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
 
 ul {
@@ -19,17 +60,46 @@ ul {
 }
 
 li {
-  margin: 10px 0;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 li span {
+  flex: 1;
   cursor: pointer;
-  margin-right: 10px;
 }
 
 li button {
+  width: auto;
+  padding: 5px 10px;
   margin-left: 10px;
+  font-size: 14px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #666;
+}
+
+input[type="date"] {
+  padding: 8px;
+  width: 100%;
+}
+
+.filter-sort {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.filter-sort label,
+.filter-sort select {
+  width: 48%;
 }

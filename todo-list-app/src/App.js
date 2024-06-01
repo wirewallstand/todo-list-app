@@ -212,7 +212,7 @@ function App() {
             onChange={handleDueDateChange}
           />
           <button onClick={handleAddTask}>Add Task</button>
-          <div>
+          <div className="filter-sort">
             <label>
               Filter:
               <select value={filter} onChange={handleFilterChange}>
