@@ -4,6 +4,8 @@ import './App.css';
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
+  const [editTaskId, setEditTaskId] = useState(null);
+  const [editTaskText, setEditTaskText] = useState('');
 
   const handleInputChange = (e) => {
     setNewTask(e.target.value);
@@ -26,6 +28,23 @@ function App() {
     ));
   };
 
+  const handleEditTask = (id, text) => {
+    setEditTaskId(id);
+    setEditTaskText(text);
+  };
+
+  const handleEditInputChange = (e) => {
+    setEditTaskText(e.target.value);
+  };
+
+  const handleUpdateTask = () => {
+    setTasks(tasks.map(task =>
+      task.id === editTaskId ? { ...task, text: editTaskText } : task
+    ));
+    setEditTaskId(null);
+    setEditTaskText('');
+  };
+
   return (
     <div className="App">
       <h1>To-Do List</h1>
@@ -39,13 +58,27 @@ function App() {
       <ul>
         {tasks.map(task => (
           <li key={task.id}>
-            <span
-              style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
-              onClick={() => handleToggleComplete(task.id)}
-            >
-              {task.text}
-            </span>
-            <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
+            {editTaskId === task.id ? (
+              <div>
+                <input
+                  type="text"
+                  value={editTaskText}
+                  onChange={handleEditInputChange}
+                />
+                <button onClick={handleUpdateTask}>Update</button>
+              </div>
+            ) : (
+              <div>
+                <span
+                  style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
+                  onClick={() => handleToggleComplete(task.id)}
+                >
+                  {task.text}
+                </span>
+                <button onClick={() => handleEditTask(task.id, task.text)}>Edit</button>
+                <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
+              </div>
+            )}
           </li>
         ))}
       </ul>
