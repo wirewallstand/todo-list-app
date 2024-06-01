@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { format, parseISO } from 'date-fns';
 import './App.css';
 
 function App() {
@@ -16,6 +17,23 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState('');
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchTasks();
+    }
+  }, [isAuthenticated]);
+
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/tasks', {
+        headers: { Authorization: token },
+      });
+      setTasks(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleInputChange = (e) => {
     setNewTask(e.target.value);
   };
@@ -28,23 +46,50 @@ function App() {
     setNewTaskDueDate(e.target.value);
   };
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (newTask.trim() !== '') {
-      setTasks([...tasks, { id: Date.now(), text: newTask, priority: newTaskPriority, dueDate: newTaskDueDate, completed: false }]);
-      setNewTask('');
-      setNewTaskPriority('low');
-      setNewTaskDueDate('');
+      try {
+        const res = await axios.post(
+          'http://localhost:5000/api/tasks',
+          { text: newTask, priority: newTaskPriority, dueDate: newTaskDueDate },
+          { headers: { Authorization: token } }
+        );
+        setTasks([...tasks, res.data]);
+        setNewTask('');
+        setNewTaskPriority('low');
+        setNewTaskDueDate('');
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
-  const handleDeleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const handleDeleteTask = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
+        headers: { Authorization: token },
+      });
+      setTasks(tasks.filter(task => task.id !== id));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleToggleComplete = (id) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
+  const handleToggleComplete = async (id) => {
+    try {
+      const task = tasks.find(task => task.id === id);
+      const updatedTask = { ...task, completed: !task.completed };
+      await axios.put(
+        `http://localhost:5000/api/tasks/${id}`,
+        updatedTask,
+        { headers: { Authorization: token } }
+      );
+      setTasks(tasks.map(task =>
+        task.id === id ? updatedTask : task
+      ));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleEditTask = (id, text, priority, dueDate) => {
@@ -58,14 +103,29 @@ function App() {
     setEditTaskText(e.target.value);
   };
 
-  const handleUpdateTask = () => {
-    setTasks(tasks.map(task =>
-      task.id === editTaskId ? { ...task, text: editTaskText, priority: newTaskPriority, dueDate: newTaskDueDate } : task
-    ));
-    setEditTaskId(null);
-    setEditTaskText('');
-    setNewTaskPriority('low');
-    setNewTaskDueDate('');
+  const handleUpdateTask = async () => {
+    try {
+      const updatedTask = {
+        text: editTaskText,
+        priority: newTaskPriority,
+        dueDate: newTaskDueDate,
+        completed: false,
+      };
+      await axios.put(
+        `http://localhost:5000/api/tasks/${editTaskId}`,
+        updatedTask,
+        { headers: { Authorization: token } }
+      );
+      setTasks(tasks.map(task =>
+        task.id === editTaskId ? updatedTask : task
+      ));
+      setEditTaskId(null);
+      setEditTaskText('');
+      setNewTaskPriority('low');
+      setNewTaskDueDate('');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleFilterChange = (e) => {
