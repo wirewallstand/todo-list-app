@@ -4,6 +4,7 @@ import './App.css';
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
+  const [newTaskPriority, setNewTaskPriority] = useState('low');
   const [editTaskId, setEditTaskId] = useState(null);
   const [editTaskText, setEditTaskText] = useState('');
 
@@ -11,10 +12,15 @@ function App() {
     setNewTask(e.target.value);
   };
 
+  const handlePriorityChange = (e) => {
+    setNewTaskPriority(e.target.value);
+  };
+
   const handleAddTask = () => {
     if (newTask.trim() !== '') {
-      setTasks([...tasks, { id: Date.now(), text: newTask, completed: false }]);
+      setTasks([...tasks, { id: Date.now(), text: newTask, priority: newTaskPriority, completed: false }]);
       setNewTask('');
+      setNewTaskPriority('low');
     }
   };
 
@@ -28,9 +34,10 @@ function App() {
     ));
   };
 
-  const handleEditTask = (id, text) => {
+  const handleEditTask = (id, text, priority) => {
     setEditTaskId(id);
     setEditTaskText(text);
+    setNewTaskPriority(priority);
   };
 
   const handleEditInputChange = (e) => {
@@ -39,10 +46,11 @@ function App() {
 
   const handleUpdateTask = () => {
     setTasks(tasks.map(task =>
-      task.id === editTaskId ? { ...task, text: editTaskText } : task
+      task.id === editTaskId ? { ...task, text: editTaskText, priority: newTaskPriority } : task
     ));
     setEditTaskId(null);
     setEditTaskText('');
+    setNewTaskPriority('low');
   };
 
   return (
@@ -54,6 +62,11 @@ function App() {
         onChange={handleInputChange}
         placeholder="Add a new task"
       />
+      <select value={newTaskPriority} onChange={handlePriorityChange}>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
       <button onClick={handleAddTask}>Add Task</button>
       <ul>
         {tasks.map(task => (
@@ -65,6 +78,11 @@ function App() {
                   value={editTaskText}
                   onChange={handleEditInputChange}
                 />
+                <select value={newTaskPriority} onChange={handlePriorityChange}>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
                 <button onClick={handleUpdateTask}>Update</button>
               </div>
             ) : (
@@ -73,9 +91,9 @@ function App() {
                   style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
                   onClick={() => handleToggleComplete(task.id)}
                 >
-                  {task.text}
+                  {task.text} ({task.priority})
                 </span>
-                <button onClick={() => handleEditTask(task.id, task.text)}>Edit</button>
+                <button onClick={() => handleEditTask(task.id, task.text, task.priority)}>Edit</button>
                 <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
               </div>
             )}
