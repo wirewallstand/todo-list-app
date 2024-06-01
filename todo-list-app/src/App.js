@@ -16,6 +16,10 @@ function App() {
     }
   };
 
+  const handleDeleteTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
   return (
     <div className="App">
       <h1>To-Do List</h1>
@@ -35,6 +39,7 @@ function App() {
             >
               {task.text}
             </span>
+            <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
           </li>
         ))}
       </ul>
