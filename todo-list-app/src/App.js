@@ -20,6 +20,12 @@ function App() {
     setTasks(tasks.filter(task => task.id !== id));
   };
 
+  const handleToggleComplete = (id) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
+
   return (
     <div className="App">
       <h1>To-Do List</h1>
