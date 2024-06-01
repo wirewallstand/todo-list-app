@@ -9,6 +9,8 @@ function App() {
   const [newTaskDueDate, setNewTaskDueDate] = useState('');
   const [editTaskId, setEditTaskId] = useState(null);
   const [editTaskText, setEditTaskText] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [sort, setSort] = useState('date');
 
   const handleInputChange = (e) => {
     setNewTask(e.target.value);
@@ -62,6 +64,31 @@ function App() {
     setNewTaskDueDate('');
   };
 
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
+  };
+
+  const handleSortChange = (e) => {
+    setSort(e.target.value);
+  };
+
+  const filteredTasks = tasks.filter(task => {
+    if (filter === 'completed') return task.completed;
+    if (filter === 'incomplete') return !task.completed;
+    return true;
+  });
+
+  const sortedTasks = filteredTasks.sort((a, b) => {
+    if (sort === 'date') {
+      return new Date(a.dueDate) - new Date(b.dueDate);
+    }
+    if (sort === 'priority') {
+      const priorities = { low: 1, medium: 2, high: 3 };
+      return priorities[a.priority] - priorities[b.priority];
+    }
+    return 0;
+  });
+
   return (
     <div className="App">
       <h1>To-Do List</h1>
@@ -82,8 +109,25 @@ function App() {
         onChange={handleDueDateChange}
       />
       <button onClick={handleAddTask}>Add Task</button>
+      <div>
+        <label>
+          Filter:
+          <select value={filter} onChange={handleFilterChange}>
+            <option value="all">All</option>
+            <option value="completed">Completed</option>
+            <option value="incomplete">Incomplete</option>
+          </select>
+        </label>
+        <label>
+          Sort:
+          <select value={sort} onChange={handleSortChange}>
+            <option value="date">Due Date</option>
+            <option value="priority">Priority</option>
+          </select>
+        </label>
+      </div>
       <ul>
-        {tasks.map(task => (
+        {sortedTasks.map(task => (
           <li key={task.id}>
             {editTaskId === task.id ? (
               <div>
