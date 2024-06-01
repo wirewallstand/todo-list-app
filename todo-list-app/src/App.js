@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { format, parseISO } from 'date-fns';
+import axios from 'axios';
 import './App.css';
 
 function App() {
@@ -11,6 +11,10 @@ function App() {
   const [editTaskText, setEditTaskText] = useState('');
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('date');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState('');
 
   const handleInputChange = (e) => {
     setNewTask(e.target.value);
@@ -72,6 +76,26 @@ function App() {
     setSort(e.target.value);
   };
 
+  const handleRegister = async () => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/register', { username, password });
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+      setToken(res.data.token);
+      setIsAuthenticated(true);
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const filteredTasks = tasks.filter(task => {
     if (filter === 'completed') return task.completed;
     if (filter === 'incomplete') return !task.completed;
@@ -92,77 +116,98 @@ function App() {
   return (
     <div className="App">
       <h1>To-Do List</h1>
-      <input
-        type="text"
-        value={newTask}
-        onChange={handleInputChange}
-        placeholder="Add a new task"
-      />
-      <select value={newTaskPriority} onChange={handlePriorityChange}>
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-      </select>
-      <input
-        type="date"
-        value={newTaskDueDate}
-        onChange={handleDueDateChange}
-      />
-      <button onClick={handleAddTask}>Add Task</button>
-      <div>
-        <label>
-          Filter:
-          <select value={filter} onChange={handleFilterChange}>
-            <option value="all">All</option>
-            <option value="completed">Completed</option>
-            <option value="incomplete">Incomplete</option>
+      {!isAuthenticated ? (
+        <div>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+          />
+          <button onClick={handleRegister}>Register</button>
+          <button onClick={handleLogin}>Login</button>
+        </div>
+      ) : (
+        <div>
+          <input
+            type="text"
+            value={newTask}
+            onChange={handleInputChange}
+            placeholder="Add a new task"
+          />
+          <select value={newTaskPriority} onChange={handlePriorityChange}>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
           </select>
-        </label>
-        <label>
-          Sort:
-          <select value={sort} onChange={handleSortChange}>
-            <option value="date">Due Date</option>
-            <option value="priority">Priority</option>
-          </select>
-        </label>
-      </div>
-      <ul>
-        {sortedTasks.map(task => (
-          <li key={task.id}>
-            {editTaskId === task.id ? (
-              <div>
-                <input
-                  type="text"
-                  value={editTaskText}
-                  onChange={handleEditInputChange}
-                />
-                <select value={newTaskPriority} onChange={handlePriorityChange}>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-                <input
-                  type="date"
-                  value={newTaskDueDate}
-                  onChange={handleDueDateChange}
-                />
-                <button onClick={handleUpdateTask}>Update</button>
-              </div>
-            ) : (
-              <div>
-                <span
-                  style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
-                  onClick={() => handleToggleComplete(task.id)}
-                >
-                  {task.text} ({task.priority}) - {task.dueDate ? format(parseISO(task.dueDate), 'yyyy-MM-dd') : 'No due date'}
-                </span>
-                <button onClick={() => handleEditTask(task.id, task.text, task.priority, task.dueDate)}>Edit</button>
-                <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+          <input
+            type="date"
+            value={newTaskDueDate}
+            onChange={handleDueDateChange}
+          />
+          <button onClick={handleAddTask}>Add Task</button>
+          <div>
+            <label>
+              Filter:
+              <select value={filter} onChange={handleFilterChange}>
+                <option value="all">All</option>
+                <option value="completed">Completed</option>
+                <option value="incomplete">Incomplete</option>
+              </select>
+            </label>
+            <label>
+              Sort:
+              <select value={sort} onChange={handleSortChange}>
+                <option value="date">Due Date</option>
+                <option value="priority">Priority</option>
+              </select>
+            </label>
+          </div>
+          <ul>
+            {sortedTasks.map(task => (
+              <li key={task.id}>
+                {editTaskId === task.id ? (
+                  <div>
+                    <input
+                      type="text"
+                      value={editTaskText}
+                      onChange={handleEditInputChange}
+                    />
+                    <select value={newTaskPriority} onChange={handlePriorityChange}>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                    <input
+                      type="date"
+                      value={newTaskDueDate}
+                      onChange={handleDueDateChange}
+                    />
+                    <button onClick={handleUpdateTask}>Update</button>
+                  </div>
+                ) : (
+                  <div>
+                    <span
+                      style={{ textDecoration: task.completed ? 'line-through' : 'none' }}
+                      onClick={() => handleToggleComplete(task.id)}
+                    >
+                      {task.text} ({task.priority}) - {task.dueDate ? format(parseISO(task.dueDate), 'yyyy-MM-dd') : 'No due date'}
+                    </span>
+                    <button onClick={() => handleEditTask(task.id, task.text, task.priority, task.dueDate)}>Edit</button>
+                    <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
